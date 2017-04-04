@@ -2,9 +2,10 @@
   "name": "videojs-shaka-player",
   "version": "0.2.0",
   "description": "Shaka Player playback technology for Video.js",
-  "main": "src/videojs.shaka.dev.js",
+  "main": "dist/player.full.js",
   "scripts": {
     "build": "mkdir -p dist & npm run build-compile & npm run build-js & npm run build-css",
+    "prepublish": "mkdir -p dist & npm run build-compile & npm run build-js & npm run build-css",
     "build-compile": "babel ./src/js/videojs.shaka.dev.js --out-file ./src/js/videojs.shaka.js --presets=es2015 ",
     "build-js": "browserify ./src/js/player.js > ./dist/player.full.js",
     "build-css": "browserify -g browserify-css ./src/js/player-skin.js -o ./dist/player-skin.js",
