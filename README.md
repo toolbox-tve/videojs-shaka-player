@@ -21,7 +21,6 @@ npm run serve
 
 ### Usage
   - Include player-skin.js and player.full.js file in the html page.
-  - Specify "shaka" in the techOrder array as needed.
   - Look at the included example for guidance.
 
 ### Example
@@ -36,7 +35,7 @@ npm run serve
 
 <script>
 var player = videojs('example-video',{
-         techOrder: ['shaka', 'html5']
+         techOrder: ['html5']
      });
 
 player.ready(function() {
@@ -64,7 +63,7 @@ An example is provided under the /example directory. Run the build script before
 
 <script>
 var player = videojs('example-video',{
-         techOrder: ['shaka', 'html5']
+         techOrder: ['html5']
      });
 
 player.ready(function() {
