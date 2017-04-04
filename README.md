@@ -23,9 +23,72 @@ npm run serve
   - Include player-skin.js and player.full.js file in the html page.
   - Specify "shaka" in the techOrder array as needed.
   - Look at the included example for guidance.
-  
+
 ### Example
+
+```html
+<video id=example-video width=600 height=300 class="video-js vjs-default-skin" controls></video>
+
+<script src="video.js"></script>
+<script src="player-skin.js"></script>
+<script src="player.full.js"></script>
+
+
+<script>
+var player = videojs('example-video',{
+         techOrder: ['shaka', 'html5']
+     });
+
+player.ready(function() {
+  player.src({
+    src: 'https://example.com/dash.mpd',
+    type: 'application/dash+xml'
+  });
+
+  player.play();
+});
+
+</script>
+```
 An example is provided under the /example directory. Run the build script before using this example.
+
+### Example With DRM
+
+```html
+<video id=example-video width=600 height=300 class="video-js vjs-default-skin" controls></video>
+
+<script src="video.js"></script>
+<script src="player-skin.js"></script>
+<script src="player.full.js"></script>
+
+
+<script>
+var player = videojs('example-video',{
+         techOrder: ['shaka', 'html5']
+     });
+
+player.ready(function() {
+  player.src({
+    src: 'https://example.com/dash.mpd',
+    type: 'application/dash+xml',
+    keySystemOptions: [
+        {
+            name: 'com.widevine.alpha',
+            options: {
+                serverURL: 'http://url',
+                //any another advanced option
+                videoRobustness: 'HW_SECURE_ALL',
+                audioRobustness: 'HW_SECURE_ALL'
+            }
+        }
+    ]
+  });
+
+  player.play();
+});
+
+</script>
+```
 
 ### Screenshot
 Below is a screenshot of videojs-shaka-player playing an MPEG DASH (VP9/Vorbis) VoD playlist. By default, the video is played back adaptively. The quality menu (gear) is automatically populated based on the size and bitrates of the video streams listed in the playlist. You can manually select a video quality to override auto (adaptive) mode, and switch back to auto mode at any time.
