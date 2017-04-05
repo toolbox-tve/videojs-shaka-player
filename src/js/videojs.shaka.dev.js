@@ -1,3 +1,4 @@
+let shaka = require('shaka-player');
 class ShakaTech {
     constructor(source, tech, options) {
 

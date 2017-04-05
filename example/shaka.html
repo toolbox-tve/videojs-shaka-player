@@ -19,10 +19,13 @@
         var vplayer = videojs('#video', {
             techOrder: ['html5']
         });
-        vplayer.src({
-                        src: "http://cdn-1.metacdn.net/jumipqxo/s66aYH/bbb_sunflower_1080p_30fps_normal_mp4-PLAYLIST_1436171629258.mpd",
-                        type: 'application/dash+xml'
-                    });
+        vplayer.ready(function () {
+            vplayer.src({
+                            src: "http://cdn-1.metacdn.net/jumipqxo/s66aYH/bbb_sunflower_1080p_30fps_normal_mp4-PLAYLIST_1436171629258.mpd",
+                            type: 'application/dash+xml'
+                        });
+            vplayer.play();
+        });
     })();
 </script>
 </html>

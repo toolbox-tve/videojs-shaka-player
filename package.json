@@ -2,7 +2,7 @@
   "name": "videojs-shaka-player",
   "version": "0.2.0",
   "description": "Shaka Player playback technology for Video.js",
-  "main": "dist/player.full.js",
+  "main": "src/videojs.shaka.dev.js",
   "scripts": {
     "build": "mkdir -p dist & npm run build-compile & npm run build-js & npm run build-css",
     "prepublish": "mkdir -p dist & npm run build-compile & npm run build-js & npm run build-css",
@@ -27,6 +27,9 @@
     "node": ">= 5.0.0"
   },
   "license": "Apache-2.0",
+  "dependencies": {
+    "shaka-player": "2.0.5"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-es2015": "^6.24.0",
@@ -36,7 +39,6 @@
     "express": "4.13.4",
     "express-http-proxy": "0.6.0",
     "nodemon": "1.9.1",
-    "shaka-player": "2.0.5",
     "video.js": "^5.11.9"
   }
 }
