@@ -27001,27 +27001,13 @@ function extend() {
 },{}],112:[function(require,module,exports){
 (function (global){
 var videojs = global.videojs = require('video.js');
-require('./videojs.shaka.js');
+require('./videojs.shaka.dev.js');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./videojs.shaka.js":113,"video.js":103}],113:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var shaka = require('shaka-player');
-
-var ShakaTech = function () {
-    function ShakaTech(source, tech, options) {
-        var _this = this;
-
-        _classCallCheck(this, ShakaTech);
+},{"./videojs.shaka.dev.js":113,"video.js":103}],113:[function(require,module,exports){
+let shaka = require('shaka-player');
+class ShakaTech {
+    constructor(source, tech, options) {
 
         shaka.polyfill.installAll();
         options = options || tech.options_;
@@ -27039,259 +27025,243 @@ var ShakaTech = function () {
             return;
         }
 
+
         // While the manifest is loading and Dash.js has not finished initializing
         // we must defer events and functions calls with isReady_ and then `triggerReady`
         // again later once everything is setup
         tech.isReady_ = false;
 
         if (ShakaTech.updateSourceData) {
-            videojs.log.warn('updateSourceData has been deprecated.' + ' Please switch to using hook("updatesource", callback).');
+            videojs.log.warn('updateSourceData has been deprecated.' +
+                             ' Please switch to using hook("updatesource", callback).');
             source = ShakaTech.updateSourceData(source);
         }
 
         // call updatesource hooks
-        ShakaTech.hooks('updatesource').forEach(function (hook) {
+        ShakaTech.hooks('updatesource').forEach((hook) => {
             source = hook(source);
         });
 
         if (ShakaTech.ShakaTech) {
-            videojs.log.warn('beforeInitialize has been deprecated.' + ' Please switch to using hook("beforeinitialize", callback).');
+            videojs.log.warn('beforeInitialize has been deprecated.' +
+                             ' Please switch to using hook("beforeinitialize", callback).');
             ShakaTech.ShakaTech(this.player, this.mediaPlayer_);
         }
 
-        ShakaTech.hooks('beforeinitialize').forEach(function (hook) {
-            hook(_this.player, _this.mediaPlayer_);
+        ShakaTech.hooks('beforeinitialize').forEach((hook) => {
+            hook(this.player, this.mediaPlayer_);
         });
 
-        var manifestSource = source.src;
+        let manifestSource = source.src;
         this.keySystemOptions_ = ShakaTech.buildDashJSProtData(source.keySystemOptions);
         if (this.keySystemOptions_) {
-            this.mediaPlayer_.configure({ drm: this.keySystemOptions_ });
+            this.mediaPlayer_.configure({drm: this.keySystemOptions_});
         }
-        this.mediaPlayer_.load(manifestSource).then(function () {
-            _this.initShakaMenus();
-            _this.tech_.triggerReady();
+        this.mediaPlayer_.load(manifestSource).then(() => {
+            this.initShakaMenus();
+            this.tech_.triggerReady();
         });
     }
 
-    _createClass(ShakaTech, [{
-        key: 'initShakaMenus',
-        value: function initShakaMenus() {
-            var player = this.player;
-            var shakaPlayer = this.mediaPlayer_;
+    initShakaMenus() {
+        let player = this.player;
+        let shakaPlayer = this.mediaPlayer_;
 
-            player.options_['playbackRates'] = [];
-            var playerEL = player.el();
-            playerEL.className += ' vjs-shaka';
+        player.options_['playbackRates'] = [];
+        let playerEL = player.el();
+        playerEL.className += ' vjs-shaka';
 
-            var shakaButton = document.createElement('div');
-            shakaButton.setAttribute('class', 'vjs-shaka-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-icon-cog');
+        let shakaButton = document.createElement('div');
+        shakaButton.setAttribute('class', 'vjs-shaka-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-icon-cog');
 
-            var shakaMenu = document.createElement('div');
-            shakaMenu.setAttribute('class', 'vjs-menu');
-            shakaButton.appendChild(shakaMenu);
+        let shakaMenu = document.createElement('div');
+        shakaMenu.setAttribute('class', 'vjs-menu');
+        shakaButton.appendChild(shakaMenu);
 
-            var shakaMenuContent = document.createElement('ul');
-            shakaMenuContent.setAttribute('class', 'vjs-menu-content');
-            shakaMenu.appendChild(shakaMenuContent);
+        let shakaMenuContent = document.createElement('ul');
+        shakaMenuContent.setAttribute('class', 'vjs-menu-content');
+        shakaMenu.appendChild(shakaMenuContent);
 
-            var videoTracks = shakaPlayer.getTracks();
+        let videoTracks = shakaPlayer.getTracks();
 
-            var el = document.createElement('li');
-            el.setAttribute('class', 'vjs-menu-item vjs-selected');
-            var label = document.createElement('span');
-            setInnerText(label, "Auto");
-            el.appendChild(label);
-            el.addEventListener('click', function () {
-                var selected = shakaMenuContent.querySelector('.vjs-selected');
-                if (selected) {
-                    selected.className = selected.className.replace('vjs-selected', '');
+        let el = document.createElement('li');
+        el.setAttribute('class', 'vjs-menu-item vjs-selected');
+        let label = document.createElement('span');
+        setInnerText(label, "Auto");
+        el.appendChild(label);
+        el.addEventListener('click', function () {
+            let selected = shakaMenuContent.querySelector('.vjs-selected');
+            if (selected) {
+                selected.className = selected.className.replace('vjs-selected', '')
+            }
+            this.className = this.className + " vjs-selected";
+            shakaPlayer.configure({'enableAdaptation': true});
+        });
+        shakaMenuContent.appendChild(el);
+
+        for (let i = 0; i < videoTracks.length; ++i) {
+            if (videoTracks[i].type == "video") {
+                (function () {
+                    let index = videoTracks[i].id;
+                    let rate = (videoTracks[i].bandwidth / 1024).toFixed(0);
+                    let height = videoTracks[i].height;
+                    let el = document.createElement('li');
+                    el.setAttribute('class', 'vjs-menu-item');
+                    el.setAttribute('data-val', rate);
+                    let label = document.createElement('span');
+                    setInnerText(label, height + "p (" + rate + "k)");
+                    el.appendChild(label);
+                    el.addEventListener('click', function () {
+                        let selected = shakaMenuContent.querySelector('.vjs-selected');
+                        if (selected) {
+                            selected.className = selected.className.replace('vjs-selected', '')
+                        }
+                        this.className = this.className + " vjs-selected";
+                        shakaPlayer.configure({'enableAdaptation': false});
+                        shakaPlayer.selectTrack(index, false);
+                        // TODO: Make opt_clearBuffer a property of this tech
+                        // If above is set to true, you may wish to uncomment the below
+                        // player.trigger('waiting');
+                    });
+                    shakaMenuContent.appendChild(el);
+                }())
+            }
+        }
+        let controlBar = playerEL.parentNode.querySelector('.vjs-control-bar');
+
+        if (controlBar) {
+            controlBar.insertBefore(shakaButton, controlBar.lastChild);
+        }
+    }
+
+    /*
+     * Iterate over the `keySystemOptions` array and convert each object into
+     * the type of object Dash.js expects in the `protData` argument.
+     *
+     * Also rename 'licenseUrl' property in the options to an 'serverURL' property
+     * Example:
+     *  {
+     *      servers: {
+     *          'com.widevine.alpha': 'https://foo.bar/drm/widevine'
+     *      },
+     *      advanced: {
+     *          'com.widevine.alpha': {
+     *              'videoRobustness': 'HW_SECURE_ALL',
+     *              'audioRobustness': 'HW_SECURE_ALL'
+     *          }
+     *      }
+     *  }
+     */
+    static buildDashJSProtData(keySystemOptions) {
+        let output = {servers: {}};
+
+        if (!keySystemOptions || !isArray(keySystemOptions)) {
+            return null;
+        }
+        for (let i = 0; i < keySystemOptions.length; i++) {
+            let keySystem = keySystemOptions[i];
+            let options = videojs.mergeOptions({}, keySystem.options);
+
+            if (options.licenseUrl) {
+                options.serverURL = options.licenseUrl;
+                delete options.licenseUrl;
+            }
+
+            output.servers[keySystem.name] = options.serverURL;
+            delete options.serverURL;
+            if (Object.keys(options).length) {
+                if (!output.advanced) {
+                    output.advanced = {};
                 }
-                this.className = this.className + " vjs-selected";
-                shakaPlayer.configure({ 'enableAdaptation': true });
-            });
-            shakaMenuContent.appendChild(el);
-
-            var _loop = function _loop(i) {
-                if (videoTracks[i].type == "video") {
-                    (function () {
-                        var index = videoTracks[i].id;
-                        var rate = (videoTracks[i].bandwidth / 1024).toFixed(0);
-                        var height = videoTracks[i].height;
-                        var el = document.createElement('li');
-                        el.setAttribute('class', 'vjs-menu-item');
-                        el.setAttribute('data-val', rate);
-                        var label = document.createElement('span');
-                        setInnerText(label, height + "p (" + rate + "k)");
-                        el.appendChild(label);
-                        el.addEventListener('click', function () {
-                            var selected = shakaMenuContent.querySelector('.vjs-selected');
-                            if (selected) {
-                                selected.className = selected.className.replace('vjs-selected', '');
-                            }
-                            this.className = this.className + " vjs-selected";
-                            shakaPlayer.configure({ 'enableAdaptation': false });
-                            shakaPlayer.selectTrack(index, false);
-                            // TODO: Make opt_clearBuffer a property of this tech
-                            // If above is set to true, you may wish to uncomment the below
-                            // player.trigger('waiting');
-                        });
-                        shakaMenuContent.appendChild(el);
-                    })();
-                }
-            };
-
-            for (var i = 0; i < videoTracks.length; ++i) {
-                _loop(i);
-            }
-            var controlBar = playerEL.parentNode.querySelector('.vjs-control-bar');
-
-            if (controlBar) {
-                controlBar.insertBefore(shakaButton, controlBar.lastChild);
+                output.advanced[keySystem.name] = options;
             }
         }
 
-        /*
-         * Iterate over the `keySystemOptions` array and convert each object into
-         * the type of object Dash.js expects in the `protData` argument.
-         *
-         * Also rename 'licenseUrl' property in the options to an 'serverURL' property
-         * Example:
-         *  {
-         *      servers: {
-         *          'com.widevine.alpha': 'https://foo.bar/drm/widevine'
-         *      },
-         *      advanced: {
-         *          'com.widevine.alpha': {
-         *              'videoRobustness': 'HW_SECURE_ALL',
-         *              'audioRobustness': 'HW_SECURE_ALL'
-         *          }
-         *      }
-         *  }
-         */
+        return output;
+    }
 
-    }], [{
-        key: 'buildDashJSProtData',
-        value: function buildDashJSProtData(keySystemOptions) {
-            var output = { servers: {} };
+    /**
+     * Add a function hook to a specific dash lifecycle
+     *
+     * @param {string} type the lifecycle to hook the function to
+     * @param {Function|Function[]} hook the function or array of functions to attach
+     * @method hook
+     */
+    static hook(type, hook) {
+        ShakaTech.hooks(type, hook);
+    }
 
-            if (!keySystemOptions || !isArray(keySystemOptions)) {
-                return null;
-            }
-            for (var i = 0; i < keySystemOptions.length; i++) {
-                var keySystem = keySystemOptions[i];
-                var options = videojs.mergeOptions({}, keySystem.options);
+    /**
+     * Get a list of hooks for a specific lifecycle
+     *
+     * @param {string} type the lifecycle to get hooks from
+     * @param {Function=|Function[]=} hook Optionally add a hook tothe lifecycle
+     * @return {Array} an array of hooks or epty if none
+     * @method hooks
+     */
+    static hooks(type, hook) {
+        ShakaTech.hooks_[type] = ShakaTech.hooks_[type] || [];
 
-                if (options.licenseUrl) {
-                    options.serverURL = options.licenseUrl;
-                    delete options.licenseUrl;
-                }
-
-                output.servers[keySystem.name] = options.serverURL;
-                delete options.serverURL;
-                if (Object.keys(options).length) {
-                    if (!output.advanced) {
-                        output.advanced = {};
-                    }
-                    output.advanced[keySystem.name] = options;
-                }
-            }
-
-            return output;
+        if (hook) {
+            ShakaTech.hooks_[type] = ShakaTech.hooks_[type].concat(hook);
         }
 
-        /**
-         * Add a function hook to a specific dash lifecycle
-         *
-         * @param {string} type the lifecycle to hook the function to
-         * @param {Function|Function[]} hook the function or array of functions to attach
-         * @method hook
-         */
+        return ShakaTech.hooks_[type];
+    }
 
-    }, {
-        key: 'hook',
-        value: function hook(type, _hook) {
-            ShakaTech.hooks(type, _hook);
+    /**
+     * Remove a hook from a specific dash lifecycle.
+     *
+     * @param {string} type the lifecycle that the function hooked to
+     * @param {Function} hook The hooked function to remove
+     * @return {boolean} True if the function was removed, false if not found
+     * @method removeHook
+     */
+    static removeHook(type, hook) {
+        const index = ShakaTech.hooks(type).indexOf(hook);
+
+        if (index === -1) {
+            return false;
         }
 
-        /**
-         * Get a list of hooks for a specific lifecycle
-         *
-         * @param {string} type the lifecycle to get hooks from
-         * @param {Function=|Function[]=} hook Optionally add a hook tothe lifecycle
-         * @return {Array} an array of hooks or epty if none
-         * @method hooks
-         */
+        ShakaTech.hooks_[type] = ShakaTech.hooks_[type].slice();
+        ShakaTech.hooks_[type].splice(index, 1);
 
-    }, {
-        key: 'hooks',
-        value: function hooks(type, hook) {
-            ShakaTech.hooks_[type] = ShakaTech.hooks_[type] || [];
-
-            if (hook) {
-                ShakaTech.hooks_[type] = ShakaTech.hooks_[type].concat(hook);
-            }
-
-            return ShakaTech.hooks_[type];
-        }
-
-        /**
-         * Remove a hook from a specific dash lifecycle.
-         *
-         * @param {string} type the lifecycle that the function hooked to
-         * @param {Function} hook The hooked function to remove
-         * @return {boolean} True if the function was removed, false if not found
-         * @method removeHook
-         */
-
-    }, {
-        key: 'removeHook',
-        value: function removeHook(type, hook) {
-            var index = ShakaTech.hooks(type).indexOf(hook);
-
-            if (index === -1) {
-                return false;
-            }
-
-            ShakaTech.hooks_[type] = ShakaTech.hooks_[type].slice();
-            ShakaTech.hooks_[type].splice(index, 1);
-
-            return true;
-        }
-    }]);
-
-    return ShakaTech;
-}();
-
+        return true;
+    }
+}
 ShakaTech.hooks_ = {};
-var isArray = function isArray(a) {
-    return Object.prototype.toString.call(a) === '[object Array]';
-};
+const
+    isArray = function (a) {
+        return Object.prototype.toString.call(a) === '[object Array]';
+    };
 
-var canHandleKeySystems = function canHandleKeySystems(source) {
+const canHandleKeySystems = (source) => {
     // copy the source
     source = JSON.parse(JSON.stringify(source));
 
     if (ShakaTech.updateSourceData) {
-        videojs.log.warn('updateSourceData has been deprecated.' + ' Please switch to using hook("updatesource", callback).');
+        videojs.log.warn('updateSourceData has been deprecated.' +
+                         ' Please switch to using hook("updatesource", callback).');
         source = ShakaTech.updateSourceData(source);
     }
 
     // call updatesource hooks
-    ShakaTech.hooks('updatesource').forEach(function (hook) {
+    ShakaTech.hooks('updatesource').forEach((hook) => {
         source = hook(source);
     });
 
-    var videoEl = document.createElement('video');
+    let videoEl = document.createElement('video');
     return !(source.keySystemOptions && !(navigator.requestMediaKeySystemAccess ||
-    // IE11 Win 8.1
+// IE11 Win 8.1
     videoEl.msSetMediaKeys));
+
 };
-var setInnerText = function setInnerText(element, text) {
+const setInnerText = (element, text) => {
     if (typeof element === 'undefined') {
         return false;
     }
-    var textProperty = 'innerText' in element ? 'innerText' : 'textContent';
+    let textProperty = ('innerText' in element) ? 'innerText' : 'textContent';
     try {
         element[textProperty] = text;
     } catch (anException) {
@@ -27301,8 +27271,8 @@ var setInnerText = function setInnerText(element, text) {
 
 videojs.DashSourceHandler = function () {
     return {
-        canHandleSource: function canHandleSource(source) {
-            var dashExtRE = /\.mpd/i;
+        canHandleSource: function (source) {
+            let dashExtRE = /\.mpd/i;
 
             if (!canHandleKeySystems(source)) {
                 return '';
@@ -27317,18 +27287,18 @@ videojs.DashSourceHandler = function () {
             }
         },
 
-        handleSource: function handleSource(source, tech, options) {
+        handleSource: function (source, tech, options) {
             return new ShakaTech(source, tech, options);
         },
 
-        canPlayType: function canPlayType(type) {
+        canPlayType: function (type) {
             return videojs.DashSourceHandler.canPlayType(type);
         }
     };
 };
 
 videojs.DashSourceHandler.canPlayType = function (type) {
-    var dashTypeRE = /^application\/dash\+xml/i;
+    let dashTypeRE = /^application\/dash\+xml/i;
     if (dashTypeRE.test(type)) {
         return 'probably';
     }
@@ -27342,6 +27312,4 @@ if (!!window.MediaSource) {
 }
 
 videojs.ShakaTech = ShakaTech;
-exports.default = ShakaTech;
-
 },{"shaka-player":8}]},{},[112]);

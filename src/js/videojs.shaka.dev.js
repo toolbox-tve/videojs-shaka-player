@@ -305,4 +305,3 @@ if (!!window.MediaSource) {
 }
 
 videojs.ShakaTech = ShakaTech;
-export default ShakaTech;
