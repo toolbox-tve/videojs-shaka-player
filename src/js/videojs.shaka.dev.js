@@ -3,6 +3,7 @@ class ShakaTech {
     constructor(source, tech, options) {
 
         shaka.polyfill.installAll();
+
         options = options || tech.options_;
 
         this.player = videojs(options.playerId);
@@ -262,7 +263,7 @@ const setInnerText = (element, text) => {
     }
 };
 
-videojs.DashSourceHandler = function () {
+videojs.DashShakaSourceHandler = function () {
     return {
         canHandleSource: function (source) {
             let dashExtRE = /\.mpd/i;
@@ -271,7 +272,7 @@ videojs.DashSourceHandler = function () {
                 return '';
             }
 
-            if (videojs.DashSourceHandler.canPlayType(source.type)) {
+            if (videojs.DashShakaSourceHandler.canPlayType(source.type)) {
                 return 'probably';
             } else if (dashExtRE.test(source.src)) {
                 return 'maybe';
@@ -285,12 +286,12 @@ videojs.DashSourceHandler = function () {
         },
 
         canPlayType: function (type) {
-            return videojs.DashSourceHandler.canPlayType(type);
+            return videojs.DashShakaSourceHandler.canPlayType(type);
         }
     };
 };
 
-videojs.DashSourceHandler.canPlayType = function (type) {
+videojs.DashShakaSourceHandler.canPlayType = function (type) {
     let dashTypeRE = /^application\/dash\+xml/i;
     if (dashTypeRE.test(type)) {
         return 'probably';
@@ -301,7 +302,7 @@ videojs.DashSourceHandler.canPlayType = function (type) {
 
 // Only add the SourceHandler if the browser supports MediaSourceExtensions
 if (!!window.MediaSource) {
-    videojs.getTech('Html5').registerSourceHandler(videojs.DashSourceHandler(), 0);
+    videojs.getTech('Html5').registerSourceHandler(videojs.DashShakaSourceHandler(), 0);
 }
 
 videojs.ShakaTech = ShakaTech;

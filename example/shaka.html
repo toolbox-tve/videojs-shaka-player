@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>Shaka Test</title>
@@ -12,7 +13,6 @@
 <video id="video" width="640" height="360" crossOrigin="anonymous" controls class="video-js vjs-default-skin">
     Your browser does not support HTML5 video.
 </video>
-</body>
 <script type="text/javascript">
     (function () {
         var vplayer = videojs('#video', {
@@ -21,18 +21,11 @@
         vplayer.ready(function () {
             vplayer.src({
                             src: "http://cdn-1.metacdn.net/jumipqxo/s66aYH/bbb_sunflower_1080p_30fps_normal_mp4-PLAYLIST_1436171629258.mpd",
-                            type: 'application/dash+xml',
-                            keySystemOptions: [
-                                {
-                                    name: 'com.widevine.alpha',
-                                    options: {
-                                        serverURL: 'https://proxy-cert.tbxdrm.com/v1/drm-proxy/widevine/modular/tbxnet?contentId=24h.smil'
-                                    }
-                                }
-                            ]
+                            type: 'application/dash+xml'
                         });
             vplayer.play();
         });
     })();
 </script>
+</body>
 </html>
